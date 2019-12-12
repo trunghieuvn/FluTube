@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:video_player/video_player.dart';
 
+enum SourceVideo { YOUTUBE, MP4 }
+
 class FluTube extends StatefulWidget {
   /// Youtube video URL(s)
   final _videourls;
@@ -63,6 +65,9 @@ class FluTube extends StatefulWidget {
   /// Video end
   final VoidCallback onVideoEnd;
 
+  /// Source video 
+  final SourceVideo source;
+
   FluTube(
     this._videourls, {
     Key key,
@@ -82,6 +87,7 @@ class FluTube extends StatefulWidget {
     this.systemOverlaysAfterFullscreen,
     this.onVideoStart,
     this.onVideoEnd,
+    this.source = SourceVideo.MP4
   }) : super(key: key) {
     assert(_videourls is String, 'The video URL needs to be of type String.');
   }
@@ -105,6 +111,7 @@ class FluTube extends StatefulWidget {
     this.systemOverlaysAfterFullscreen,
     this.onVideoStart,
     this.onVideoEnd,
+    this.source = SourceVideo.YOUTUBE
   }) : super(key: key) {
     assert(_videourls is List<String>, 'The video playlist needs to be of type List<String>.');
     assert(_videourls.length > 0, 'Playlist should not be empty!');
@@ -298,15 +305,22 @@ class FluTubeState extends State<FluTube>{
   }
 
   Future<String> _fetchVideoURL(String yt) async {
-    final response = await http.get(yt);
-    Iterable parseAll = _allStringMatches(response.body, RegExp("\"url_encoded_fmt_stream_map\":\"([^\"]*)\""));
-    final Iterable<String> parse = _allStringMatches(parseAll.toList()[0], RegExp("url=(.*)"));
-    final List<String> urls = parse.toList()[0].split('url=');
-    parseAll = _allStringMatches(urls[1], RegExp("([^&,]*)[&,]"));
-    String finalUrl = Uri.decodeFull(parseAll.toList()[0]);
-    if(finalUrl.indexOf('\\u00') > -1)
-      finalUrl = finalUrl.substring(0, finalUrl.indexOf('\\u00'));
-    return finalUrl;
+    if(widget.source == SourceVideo.YOUTUBE){
+      final response = await http.get(yt);
+      Iterable parseAll = _allStringMatches(response.body, RegExp("\"url_encoded_fmt_stream_map\":\"([^\"]*)\""));
+      final Iterable<String> parse = _allStringMatches(parseAll.toList()[0], RegExp("url=(.*)"));
+      final List<String> urls = parse.toList()[0].split('url=');
+      parseAll = _allStringMatches(urls[1], RegExp("([^&,]*)[&,]"));
+      String finalUrl = Uri.decodeFull(parseAll.toList()[0]);
+      if(finalUrl.indexOf('\\u00') > -1)
+        finalUrl = finalUrl.substring(0, finalUrl.indexOf('\\u00'));
+      return finalUrl;
+    }else if(widget.source == SourceVideo.MP4) {
+      return yt;
+    }else{
+      return null;
+    }
+    
   }
 
   Iterable<String> _allStringMatches(String text, RegExp regExp) => regExp.allMatches(text).map((m) => m.group(0));
