@@ -253,6 +253,7 @@ class FluTubeState extends State<FluTube>{
 
   @override
   Widget build(BuildContext context) {
+    String _linkImage = widget.source == SourceVideo.MP4 ? "https://fighttech.vn/media/image.png" : _videoThumbURL(_isPlaylist ? widget._videourls[_currentlyPlaying] : widget._videourls);
     if(widget.showThumb && !isPlaying && _needsShowThumb){
       return Center(
         child: Container(
@@ -263,7 +264,7 @@ class FluTubeState extends State<FluTube>{
               fit: StackFit.expand,
               children: <Widget>[
                 Image.network(
-                  _videoThumbURL(_isPlaylist ? widget._videourls[_currentlyPlaying] : widget._videourls),
+                  _linkImage,
                   fit: BoxFit.cover,
                 ),
                 Center(
