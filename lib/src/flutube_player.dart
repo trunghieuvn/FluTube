@@ -68,6 +68,9 @@ class FluTube extends StatefulWidget {
   /// Source video 
   final SourceVideo source;
 
+  ///custom Thumnail 
+  final Widget customThumnail;
+
   FluTube(
     this._videourls, {
     Key key,
@@ -87,6 +90,7 @@ class FluTube extends StatefulWidget {
     this.systemOverlaysAfterFullscreen,
     this.onVideoStart,
     this.onVideoEnd,
+    this.customThumnail,
     this.source = SourceVideo.MP4
   }) : super(key: key) {
     assert(_videourls is String, 'The video URL needs to be of type String.');
@@ -111,6 +115,7 @@ class FluTube extends StatefulWidget {
     this.systemOverlaysAfterFullscreen,
     this.onVideoStart,
     this.onVideoEnd,
+    this.customThumnail,
     this.source = SourceVideo.YOUTUBE
   }) : super(key: key) {
     assert(_videourls is List<String>, 'The video playlist needs to be of type List<String>.');
@@ -263,6 +268,7 @@ class FluTubeState extends State<FluTube>{
             child: Stack(
               fit: StackFit.expand,
               children: <Widget>[
+                widget.customThumnail ??
                 Image.network(
                   _linkImage,
                   fit: BoxFit.cover,
@@ -277,18 +283,17 @@ class FluTubeState extends State<FluTube>{
                         icon: Icon(
                           Icons.play_arrow,
                         ),
-                        onPressed: () {
-                          setState(() async{
-                            if(!videoController.value.initialized){
-                              await videoController.initialize();
-                              await videoController.play();
-                              _needsShowThumb = false;
+                        onPressed: () async {
+                          if(!videoController.value.initialized){
+                            await videoController.initialize();
+                            await videoController.play();
 
-                            }else{
-                              videoController.play();
-                              _needsShowThumb = false;
+                          }else{
+                            videoController.play();
 
-                            }
+                          }
+                          setState(() {
+                            _needsShowThumb = false;
                           });
                         },
                       ),
