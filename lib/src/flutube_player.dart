@@ -278,9 +278,17 @@ class FluTubeState extends State<FluTube>{
                           Icons.play_arrow,
                         ),
                         onPressed: () {
-                          setState(() {
-                            videoController.play();
-                            _needsShowThumb = false;
+                          setState(() async{
+                            if(!videoController.value.initialized){
+                              await videoController.initialize();
+                              await videoController.play();
+                              _needsShowThumb = false;
+
+                            }else{
+                              videoController.play();
+                              _needsShowThumb = false;
+
+                            }
                           });
                         },
                       ),
