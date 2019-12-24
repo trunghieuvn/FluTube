@@ -160,9 +160,32 @@ class FluTubeState extends State<FluTube>{
         videoController.addListener(_startListener);
       }
 
-      chewieController = ChewieController(
+      if(widget.autoInitialize)
+      {
+        videoController.initialize().then((values){
+          chewieController = ChewieController(
+              videoPlayerController: videoController,
+              aspectRatio: widget.aspectRatio ?? (videoController?.value?.aspectRatio ?? 16/9),
+              autoInitialize: widget.autoInitialize,
+              autoPlay: widget.autoPlay,
+              startAt: widget.startAt,
+              looping: _isPlaylist ? false : widget.looping,
+              placeholder: widget.placeholder,
+              showControls: widget.showControls,
+              fullScreenByDefault: widget.fullscreenByDefault,
+              allowFullScreen: widget.allowFullScreen,
+              deviceOrientationsAfterFullScreen: widget.deviceOrientationAfterFullscreen,
+              systemOverlaysAfterFullScreen: widget.systemOverlaysAfterFullscreen,
+              allowedScreenSleep: widget.allowScreenSleep,
+              allowMuting: widget.allowMuting
+          );
+          setState((){})  ;
+        });
+      }else{
+
+        chewieController = ChewieController(
           videoPlayerController: videoController,
-          aspectRatio: widget.aspectRatio,
+          aspectRatio: widget.aspectRatio ?? (videoController.value.aspectRatio ?? 16/9),
           autoInitialize: widget.autoInitialize,
           autoPlay: widget.autoPlay,
           startAt: widget.startAt,
@@ -175,7 +198,12 @@ class FluTubeState extends State<FluTube>{
           systemOverlaysAfterFullScreen: widget.systemOverlaysAfterFullscreen,
           allowedScreenSleep: widget.allowScreenSleep,
           allowMuting: widget.allowMuting
-      );
+        );
+      }
+      
+
+
+      
     });
   }
 
@@ -264,7 +292,7 @@ class FluTubeState extends State<FluTube>{
         child: Container(
           width: MediaQuery.of(context).size.width,
           child: AspectRatio(
-            aspectRatio: widget.aspectRatio,
+            aspectRatio: widget.aspectRatio ?? (videoController?.value?.aspectRatio ?? 16/9),
             child: Stack(
               fit: StackFit.expand,
               children: <Widget>[
@@ -310,7 +338,7 @@ class FluTubeState extends State<FluTube>{
         key: widget.key,
         controller: chewieController,
       ) : AspectRatio(
-        aspectRatio: widget.aspectRatio,
+        aspectRatio: widget.aspectRatio ?? (videoController?.value?.aspectRatio ?? 16/9),
         child: Center(
           child: CircularProgressIndicator(),
         ),
