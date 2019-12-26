@@ -70,7 +70,7 @@ class FluTube extends StatefulWidget {
 
   ///custom Thumnail 
   final Widget customThumnail;
-
+  
   FluTube(
     this._videourls, {
     Key key,
@@ -127,6 +127,7 @@ class FluTube extends StatefulWidget {
 }
 
 class FluTubeState extends State<FluTube>{
+  static Map mapAspecRatio = Map();
   VideoPlayerController videoController;
   ChewieController chewieController;
   bool isPlaying = false;
@@ -165,7 +166,7 @@ class FluTubeState extends State<FluTube>{
         videoController.initialize().then((values){
           chewieController = ChewieController(
               videoPlayerController: videoController,
-              aspectRatio: widget.aspectRatio ?? (videoController?.value?.aspectRatio ?? 16/9),
+              aspectRatio: widget.aspectRatio ?? (FluTubeState.mapAspecRatio[widget._videourls] ?? (videoController?.value?.aspectRatio ?? 16/9)),
               autoInitialize: widget.autoInitialize,
               autoPlay: widget.autoPlay,
               startAt: widget.startAt,
@@ -185,7 +186,7 @@ class FluTubeState extends State<FluTube>{
 
         chewieController = ChewieController(
           videoPlayerController: videoController,
-          aspectRatio: widget.aspectRatio ?? (videoController.value.aspectRatio ?? 16/9),
+          aspectRatio: widget.aspectRatio ?? (FluTubeState.mapAspecRatio[widget._videourls] ?? (videoController?.value?.aspectRatio ?? 16/9)),
           autoInitialize: widget.autoInitialize,
           autoPlay: widget.autoPlay,
           startAt: widget.startAt,
@@ -208,6 +209,9 @@ class FluTubeState extends State<FluTube>{
   }
 
   _playingListener() {
+    if(videoController.value != null && videoController.value.initialized && FluTubeState.mapAspecRatio[widget._videourls] == null){
+      FluTubeState.mapAspecRatio[widget._videourls] = videoController.value.aspectRatio;
+    }
     if(isPlaying != videoController.value.isPlaying){
       setState(() {
         isPlaying = videoController.value.isPlaying;
@@ -338,7 +342,7 @@ class FluTubeState extends State<FluTube>{
         key: widget.key,
         controller: chewieController,
       ) : AspectRatio(
-        aspectRatio: widget.aspectRatio ?? (videoController?.value?.aspectRatio ?? 16/9),
+        aspectRatio: widget.aspectRatio ?? (FluTubeState.mapAspecRatio[widget._videourls] ?? (videoController?.value?.aspectRatio ?? 16/9)),
         child: Center(
           child: CircularProgressIndicator(),
         ),
